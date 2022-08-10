@@ -11,18 +11,18 @@ const app = express();
 //Configurar los cors- accesos desde cualquier dominio
 app.use(cors());
 
+//Lectura y parseo del Body
+app.use(express.json());
+
 // LLamado a la base de datos 
 dbConnection();
 
 //console.log(process.env);
 
 //RUTAS
-app.get('/', (req, resp) => {
-    resp.json({
-        ok: true,
-        msg: 'Hola Mundo'
-    })
-})
+app.use('/api/usuarios', require('./routes/usuarios'));
+app.use('/api/login', require('./routes/auth'));
+
 
 
 
