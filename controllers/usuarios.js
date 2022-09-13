@@ -10,12 +10,20 @@ const { generarJwt } = require('../helpers/jwt');
 //Listar usuarios
 const getUsuarios = async (req, res = response) => {
 
-    const usuarios = await Usuario.find({}, 'nombre email google');
+    const desde = Number(req.query.desde) || 0;   
 
-    res.json({
-        ok: true,
-        usuarios,        
-    });
+    const [usuarios, total ] = await Promise.all([
+        Usuario.find({}, 'nombre email google img')
+            .skip(desde)
+            .limit(5),
+            Usuario.count()    
+    ]);
+    
+        res.json({
+            ok: true,
+            usuarios,
+            total,
+});
 };
 
 //Crear nuevo usuario
@@ -42,8 +50,8 @@ const crearUsuario = async (req, res = response) => {
         //Guardar usuario
         await usuario.save();
 
-         //Generar un token 
-         const token = await generarJwt(usuario.id);
+        //Generar un token 
+        const token = await generarJwt(usuario.id);
 
         res.json({
             ok: true,
