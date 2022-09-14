@@ -4,12 +4,16 @@ const cors = require('cors');
 
 
 const { dbConnection } = require('./database/config');
+const { use } = require('./routes/usuarios');
 
 //Crear el servidor Express
 const app = express();
 
 //Configurar los cors- accesos desde cualquier dominio
 app.use(cors());
+
+//Carpeta publica
+app.use( express.static('public'));
 
 //Lectura y parseo del Body
 app.use(express.json());
