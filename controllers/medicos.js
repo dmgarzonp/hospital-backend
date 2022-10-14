@@ -4,7 +4,11 @@
 const { response } = require("express");
 const Medico = require("../models/medico");
 
-
+/**
+ * **************************
+ * OBTENER LISTADO DE MEDICOS
+ * **************************
+ */
 const getMedicos = async (req, res = response) => {
 
     const medicos = await Medico.find()
@@ -15,6 +19,12 @@ const getMedicos = async (req, res = response) => {
         medicos
     })
 };
+
+/**
+ * **************************
+ * CREAR MEDICO NUEVO
+ * **************************
+ */
 
 const crearMedico = async (req, res = response) => {
 
@@ -41,18 +51,94 @@ const crearMedico = async (req, res = response) => {
     
 };
 
-const actualizarMedico = (req, res = response) => {
-    res.json({
-        ok: true,
-        msg: 'actualizarMedico'
-    })
+
+/**
+ * **************************
+ * ACTUALIZAR MEDICO
+ * **************************
+ */
+const actualizarMedico = async(req, res = response) => {
+
+    const id = req.params.id; //Obtener id de Medico
+    const uid = req.uid; // Obtener ID de usuario
+
+    try {
+        //Buscar por ID al medico
+        const medico = await Medico.findById( id );
+
+
+        //Comprobar si el medico existe
+        if (!medico) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Medico no encontrado'
+            });
+        }
+
+        //Campos a ser cambiados
+        const cambiosMedico = {
+            ...req.body,
+            usuario: uid,
+        }
+
+        //actualizar medico
+        const medicoActualizado = await Medico.findByIdAndUpdate( id, cambiosMedico, {new: true});
+        res.json({
+            ok: true,
+            msg: medicoActualizado
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Comuniquese con el administrado'
+        })
+    }
+
+   
 };
 
-const eliminarMedico = (req, res = response) => {
-    res.json({
-        ok: true,
-        msg: 'eliminarMedico'
-    })
+
+/**
+ * **************************
+ * ELIMINAR MEDICO
+ * **************************
+ */
+
+const eliminarMedico = async(req, res = response) => {
+
+    //Obtener id de Medico
+    const id = req.params.id;
+
+    try {
+        //Buscar medico 
+        const medico = await Medico.findById( id );
+
+        if (!medico) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Medico no encontrado'
+            })
+        }
+
+        //Borrar el medico
+        await Medico.findByIdAndDelete( id );
+
+        res.json({
+            ok: true,
+            msg: 'Medico eliminado'
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Comuniquese con el madministrador'
+        })
+        
+    }
+    
 };
 
 

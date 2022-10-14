@@ -4,6 +4,7 @@
 
 const { response } = require("express");
 const Enfermera = require('../models/enfermera');
+const medico = require("../models/medico");
 
 
 
@@ -48,19 +49,91 @@ const crearEnfermera = async ( req, res = response) => {
     
 };
 
-//Funsion para actualizacion
-const actualizarEnfermera = ( req, res = response) => {
-    res.json({
-        ok: true,
-        msg: 'actualizarEnfermera'
-    })
+/**
+ * **************************
+ * ACTUALIZAR ENFERMERA
+ * **************************
+ */
+const actualizarEnfermera = async( req, res = response) => {
+    const id = req.params.id;
+    const uid = req.uid;
+
+    try {
+        //BUscar enfermera por id
+        const enfermera = await Enfermera.findById( id );
+
+        //comprobar si la enfermera existe 
+        if (!enfermera) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Enfermera no encontrada'
+            });
+        }
+
+        //campos a ser actualizados
+        const cambiosEnfermera = {
+            ...req.body,
+            usuario: uid
+        }
+
+        //Actualizar enfermera
+        const enfermeraActualizada = await Enfermera.findByIdAndUpdate(id, cambiosEnfermera, {new: true});
+        res.json({
+            ok: true,
+            msg: enfermeraActualizada
+        });
+        
+
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Comuniquese con el administrado'
+        })
+    }
+   
 };
 
-const eliminarEnfermera = ( req, res = response) => {
-    res.json({
-        ok: true,
-        msg: 'eliminarEnfermera'
-    })
+/**
+ * **************************
+ * ELIMINAR MEDICO
+ * **************************
+ */
+
+const eliminarEnfermera = async( req, res = response) => {
+
+    //Obtener id de enfermera
+    const id = req.params.id;
+
+    try {
+        //Buscar enfermera por id
+        const enfermera = await Enfermera.findById( id );
+
+        if (!enfermera) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Enfermera no encontrada'
+            });
+        }
+
+        //Borrar enfermera 
+        await Enfermera.findByIdAndDelete( id );
+
+        res.json({
+            ok: true,
+            msg: 'Enfermera  eliminada'
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Comuniquese con el madministrador'
+        })
+    }
+
+    
 };
 
 module.exports = {

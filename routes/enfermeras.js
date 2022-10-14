@@ -33,9 +33,23 @@ router.post('/',[
 ], crearEnfermera);
 
 //actualizar enfermera
-router.put('/:id', actualizarEnfermera);
+router.put('/:id',
+[
+    validarJwt,
+    check('nombre', 'El nombre de enfermera es requerido').not().isEmpty(),
+    check('hospital', 'La enfermera ID debe ser valido').isMongoId(),
+    validarCampos
+] ,actualizarEnfermera
 
-//eliminar enfermera
-router.delete('/:id', eliminarEnfermera);
+);
+
+
+
+
+
+//rutas para eliminar enfermera 
+router.delete('/:id',  validarJwt, eliminarEnfermera);
+
 
 module.exports = router;
+
